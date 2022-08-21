@@ -1,0 +1,22 @@
+---
+- hosts: all
+  tasks:
+    - name: Install telnet
+      ansible.builtin.package:
+        name: telnet
+        state: latest
+
+    - name: Install telnet, but with apt
+      ansible.builtin.apt:
+        name: telnet
+        state: latest
+
+    - name: Install netcat
+      ansible.builtin.package:
+        name: netcat
+        state: latest
+
+    - name: Install NGINX
+      ansible.builtin.package:
+        name: nginx
+        state: latest
