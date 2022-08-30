@@ -8,46 +8,32 @@ import future.keywords.contains
 # # Rules with duplicate names are evaluated as a logical OR
 # # The below example will match packages installed by the package or apt module
 
-deny_telnet_with_package contains msg if {
+deny_telnet contains msg if {
   some task in input.tasks
   task["ansible.builtin.package"].name == "telnet"
   task["ansible.builtin.package"].state != "absent"
   msg := sprintf("Task '%v' contains illegal package telnet", [task["name"]])
 }
 
-deny_telnet_with_apt contains msg if {
+deny_telnet contains msg if {
   some task in input.tasks
   task["ansible.builtin.apt"].name == "telnet"
   task["ansible.builtin.apt"].state != "absent"
   msg := sprintf("Task '%v' contains illegal package telnet", [task["name"]])
 }
 
-deny_netcat_with_package contains msg if {
+deny_netcat contains msg if {
   some task in input.tasks
   task["ansible.builtin.package"].name == "netcat"
   task["ansible.builtin.package"].state != "absent"
   msg := sprintf("Task '%v' contains illegal package netcat", [task["name"]])
 }
 
-deny_netcat_with_apt contains msg if {
+deny_netcat contains msg if {
   some task in input.tasks
   task["ansible.builtin.apt"].name == "netcat"
   task["ansible.builtin.apt"].state != "absent"
   msg := sprintf("Task '%v' contains illegal package netcat", [task["name"]])
-}
-
-# Use -o json to view this violation output
-violation_netcat contains complex_message if {
-  some task in input.tasks
-  task["ansible.builtin.package"].name == "netcat"
-  task["ansible.builtin.package"].state != "absent"
-  complex_message := {
-    "msg": "Netcat is not a permitted package",
-    "details": {
-      "wiki_article": "https://wiki.example.com/allowed_packages",
-      "security_policy": "SEC-12345"
-    }
-  }
 }
 
 # ##### Method 2: Less duplication  #####
@@ -65,4 +51,26 @@ deny_bad_packages contains msg if {
   task[ansible_module].name == illegal_package
   task[ansible_module].state != "absent"
   msg := sprintf("Task '%v' contains illegal package %v", [task["name"], illegal_package])
+}
+
+# Examples of violation and warn messages
+
+# Use -o json to view this violation output
+violation_netcat contains complex_message if {
+  some task in input.tasks
+  task["ansible.builtin.package"].name == "netcat"
+  task["ansible.builtin.package"].state != "absent"
+  complex_message := {
+    "msg": "Netcat is not a permitted package",
+    "details": {
+      "wiki_article": "https://wiki.example.com/allowed_packages",
+      "security_policy": "SEC-12345"
+    }
+  }
+}
+
+warn_apt contains msg if {
+  some task in input.tasks
+  task["ansible.builtin.apt"]
+  msg := sprintf("Task '%v' uses the apt module. Please use the package module instead.", [task["name"]])
 }
