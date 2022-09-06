@@ -42,8 +42,8 @@ docker run -d -p 5000:5000 --restart always --name registry registry:2
 Next, push each bundle to the repository:
 
 ```
-conftest push localhost:5000/architecture architecture/
-conftest push localhost:5000/security security/
+conftest push -p architecture/ localhost:5000/architecture
+conftest push -p security/ localhost:5000/security
 ```
 
 Once the bundles have been pushed up to the repository, you can download them:
